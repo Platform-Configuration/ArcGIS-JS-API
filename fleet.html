@@ -1,0 +1,134 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Fleet routing</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .popupDiv {
+            display: none;
+            position: absolute;
+            border-radius: 5px;
+            background-color: #119cb0;
+            border: 1px solid #ef6c00;
+            font-size: 12px;
+            color: white;
+            padding: 5px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/themes/light/main.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+    <div style="position: absolute; top: 18%; left:1%;" id="buttons-div">
+        <button class="btn btn-md btn-warning" onclick="chooseDepot()" id="choose-depot">Choose Depot</button>
+        <button class="btn btn-md btn-warning" onclick="addStops()" id="add-stops"
+            style="display: none;margin-top: 10px;">Choose Stops</button>
+        <button class="btn btn-md btn-warning" onclick="solve()" id="solve"
+            style="display: none;margin-top: 10px">Solve</button>
+
+    </div>
+    <div id="depot-div" class="popupDiv" style="position:absolute; left: 10%; top: 18%;">
+        <table style="color:white;left:100%">
+            <thead>
+                <tr>
+                    <th>Depot Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td><input type="text" id="depot-name" value="Bay Cities Kitchens and Appliances" size="20">
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" name="" id="use-location"></td>
+                    <td><span>Use Current location</span>
+                    </td>
+                </tr>
+        </table>
+        <button type="button" class="btn btn-sm btn-warning" id="add-depot"
+            style="float: right;margin-top: 3px;color: white;">Done</button>
+        <tbody>
+    </div>
+
+    <div id="service-div" class="popupDiv">
+        <div>
+            <table style="color:white">
+                <thead>
+                    <tr>
+                        <th>Add stop</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type="text" id="stop-name" value="Stop1" size="10"></td>
+                    </tr>
+                    <tr>
+                        <td>Service time</td>
+                        <td><input type="text" id="stop-time" value="10" size="10" placeholder="In minutes"></td>
+                    </tr>
+            </table>
+            <button type="button" class="btn btn-sm btn-warning" id="add-service"
+                style="float: right;margin-top: 3px;color: white;">Done</button>
+            <tbody>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="background-color:#119cb0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel" style="color:white">Solving ....</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="spinner-grow text-primary" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status" style="display:inline-block">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -37,8 +37,11 @@
             "esri/layers/GraphicsLayer",
             "esri/tasks/RouteTask",
             "esri/tasks/support/RouteParameters",
-            "esri/tasks/support/FeatureSet"
-        ], function (esriConfig, Map, WebMap, MapView, Graphic, GraphicsLayer, RouteTask, RouteParameters, FeatureSet) {
+            "esri/tasks/support/FeatureSet",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Legend"
+        ], function (esriConfig, Map, WebMap, MapView, Graphic, GraphicsLayer, RouteTask, RouteParameters, 
+            FeatureSet, FeatureLayer, Legend) {
 
             esriConfig.apiKey = "AAPK8af285ec18774f22ba631dd7c1a60926uaAXG5lxoxa_TmiwVPq5wAg2M7yEquHgx8Cx7fZPMqMrUL7RMIz3Y3JSMVzyvp1Z";
 
@@ -47,9 +50,6 @@
             var routeTask = new RouteTask({
                 url: "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World"
             });
-
-            // The stops and route result will be stored in this layer
-            var routeLayer = new GraphicsLayer();
 
             // Setup the route parameters
             var routeParams = new RouteParameters({
@@ -63,16 +63,8 @@
                 directionsLengthUnits: "kilometers"
             });
 
-            // Define the symbology used to display the stops
-            var stopSymbol = {
-                type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-                style: "cross",
-                size: 50,
-                outline: {
-                    // autocasts as new SimpleLineSymbol()
-                    width: 4
-                }
-            };
+            // The stops and route result will be stored in this layer
+            var routeLayer = new GraphicsLayer();
 
             // Define the symbology used to display the route
             var routeSymbol = {
@@ -87,22 +79,30 @@
                 }
             });
 
+            // Add the graphics layer to the map
             map.layers.add(routeLayer)
-            // var map = new Map({
-            //     basemap: "streets-navigation-vector",
-            //     layers: [routeLayer] // Add the route layer to the map
-            // });
 
+            const foundLayer = map.allLayers.find(function (layer) {
+                return layer.title === "Aman_User";
+            });
+            // Create a map view            
             var view = new MapView({
                 container: "viewDiv", // Reference to the scene div created in step 5
                 map: map, // Reference to the map object created before the scene
-                // center: [-117.195, 34.057],
-                // zoom: 13
             });
+
+            var legend = new Legend({
+                view: view,
+                layerInfos: [{
+                    layer: foundLayer,
+                    title: "Legend"
+                }]
+            });
+
+            view.ui.add(legend, "bottom-right");
 
             // Adds a graphic when the user clicks the map. If 2 or more points exist, route is solved.
             view.on("click", addStop);
-
             function addGraphic(type, point) {
                 const graphic = new Graphic({
                     symbol: {
@@ -115,9 +115,7 @@
                 view.graphics.add(graphic);
             }
 
-
             function addStop(event) {
-
                 if (view.graphics.length === 0) {
                     addGraphic("origin", event.mapPoint);
                 } else if (view.graphics.length === 1) {
@@ -131,12 +129,7 @@
 
             function getRoute() {
                 routeParams.stops.features = view.graphics.toArray()
-                // const routeParams = new RouteParameters({
-                //     stops: new FeatureSet({
-                //         features: view.graphics.toArray()
-                //     }),
 
-                // });
                 routeTask.solve(routeParams).then(function (data) {
                     data.routeResults.forEach(function (result) {
                         result.route.symbol = {
@@ -146,7 +139,6 @@
                         };
                         view.graphics.add(result.route);
                     });
-                    debugger
                     // Display directions
                     let features, directions;
                     if (data.routeResults.length > 0) {
@@ -166,32 +158,6 @@
                     view.ui.empty("top-right");
                     view.ui.add(directions, "top-right");
                 });
-            }
-
-            // Adds the solved route to the map as a graphic
-            function showRoute(data) {
-                debugger
-                var routeResult = data.routeResults[0].route;
-                routeResult.symbol = routeSymbol;
-                routeLayer.add(routeResult);
-
-                // Display directions
-                if (data.routeResults.length > 0) {
-                    const directions = document.createElement("ol");
-                    directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-                    directions.style.marginTop = "0";
-                    directions.style.padding = "15px 15px 15px 30px";
-                    const features = data.routeResults[0].directions.features;
-                }
-                // Show each direction
-                features.forEach(function (result, i) {
-                    const direction = document.createElement("li");
-                    direction.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " miles)";
-                    directions.appendChild(direction);
-                });
-
-                view.ui.empty("top-right");
-                view.ui.add(directions, "top-right");
             }
         })
     </script>
